@@ -9,7 +9,7 @@ Requires(post): systemd-units
 Requires(preun): systemd-units
 Requires(postun): systemd-units
 Requires: coreutils, gawk, grep, sed, openssl, iproute
-Requires: bind, nginx, wget >= 1.17 
+Requires: bind, nginx, wget >= 1.17.1
 BuildRequires: systemd-units
 BuildArch: noarch
 

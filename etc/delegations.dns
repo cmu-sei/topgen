@@ -1,0 +1,51 @@
+##-------------------------------------------------------------------------
+## DELEGATIONS:
+##   For each delegated 2nd-level domain (forward) or /24 subnet (reverse),
+##   we list one or more name server fqdn(s), which will handle lookups
+##   for that respective domain or subnet.
+##   We then separately list each name server fqdn with its ip address.
+##   NOTE: each listed delegation name server MUST have a subsequent entry
+##   listing its IP address, but we do not enforce that programmatically.
+##   Failure to provide an IP address for any of the delegation name servers
+##   results in undefined behavior at this time.
+##   FIXME: we can either read in the following three hashes from a config
+##   file programmatically (and add the checks there), or we can add a step
+##   to check for consistency across the three hashes, if it turns out that
+##   mistakes are simply TOO easy to make :)
+##-------------------------------------------------------------------------
+
+# Map delegated forward domains to their designated name servers:
+# (these will end up as NS records in the corresponding TLD forward zone)
+# NOTE: 2nd level (e.g., foo.tld) domains only!!!
+declare -A DELEGATIONS_FWD=(
+  # ['eisenhower.mil']='ns.eisenhower.mil ns.eisenhower.com'
+  #['eisenhower.mil']='ns1.eisenhower.mil'
+  #['mail.mil']='ns1.mail.mil'
+  #['exercise-control.com']='mail.exercise-control.com'
+  #['gmail.com']='mail.gmail.com'
+  #['freenode.org']='mail.freenode.org'
+  #['twitter.com']='mail.twitter.com'
+)
+
+# Map delegated reverse domains to their designated name servers:
+# (these will end up as NS records in the corresponding /8 TLD reverse zone)
+# NOTE: Class-C (/24) networks only!!!
+declare -A DELEGATIONS_REV=(
+  # ['155.6.4']='ns.eisenhower.mil ns.eisenhower.com'
+  #['155.6.4']='ns1.eisenhower.mil'
+  #['142.59.1']='ns1.mail.mil'
+  #['199.59.150']='mail.exercise-control.com mail.gmail.com mail.freenode.org mail.twitter.com'
+)
+
+# Specify IP addresses for each designated name server listed above:
+# (these will end up as A (glue) records in their respective TLD zones)
+declare -A DELEGATIONS_NS=(
+  # ['ns.eisenhower.mil']='155.6.4.10'
+  # ['ns.eisenhower.com']='155.6.4.11'
+  #['ns1.eisenhower.mil']='155.6.4.10'
+  #['ns1.mail.mil']='142.59.1.10'
+  #['mail.exercise-control.com']='199.59.150.11'
+  #['mail.gmail.com']='199.59.150.11'
+  #['mail.freenode.org']='199.59.150.11'
+  #['mail.twitter.com']='199.59.150.11'
+)

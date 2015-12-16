@@ -1,0 +1,75 @@
+FIXME: polish this documentation file before the official release!
+
+TopGen provides a simulation of the Internet (Web, DNS, etc.) for
+cybersecurity exercise environments.
+
+
+1. Scraper
+
+Web content is served from a single instance of nginx, using virtual
+hostsing (vhosts). The scraper (topgen-scrape.sh) will statically
+download a set of sites listed in /etc/topgen/scrape_sites.txt, and,
+if needed, generate certificates for each virtual web host (vhost)
+signed with a topgen-specific self-signed CA (which is also generated
+if needed).
+
+Alternatively, a pre-existing set of vhosts (and certificates) can be
+imported into /var/lib/topgen/<...>. Note that, depending on the size
+of the desired set of sites to download, the scraper may run for a long
+time (e.g., several weeks for collecting the top-500 most popular sites
+at depth 1).
+
+2. DNS
+
+Given a set of scraped Web vhosts, a DNS configuration can be generated
+(using topgen-mkdns.sh). Thirteen root DNS servers (a..m), three top-level
+domain servers, and two public caching servers are simulated with a single
+instance of named, using views. The DNS configuration generator can accept
+a list of delegations (/etc/topgen/delegations.dns) for forward 2nd-level
+domains and reverse /24 networks, in case the exercise being supported
+contains authoritative DNS service for its own domain(s) and network(s).
+
+3. Systemd (service startup)
+
+After scraping the list of desired Web vhosts (or installing the Web
+content manually under /var/lib/topgen/<...>), start the topgen-nginx
+service ("systemctl start topgen-nginx"), and optionally the topgen-dns
+service ("systemctl start topgen-dns"). All Web vhost (and virtual DNS
+server) IP addresses will be configured as secondaries on the loopback
+interface (and DNS configuration will be created on demand). At this
+stage, TopGen Web and DNS functionality can be tested locally.
+
+4. Routing (quagga/bgpd)
+
+To act as a universal Web (and DNS) server to the rest of the machines
+in an exercise, the host running TopGen must announce a default BGP
+route. The include example kickstart file (contrib/greybox_f22.ks) will
+automatically create a BGP configuration assuming the default gateway
+used during the install to be the BGP peer. Edit /etc/quagga/bgpd.conf
+to modify parameters as needed (BGP peer IP address, AS number, etc.).
+Once BGP is configured, starting the bgpd service ("systemctl start bgpd")
+will begin announcing a default route into BGP, attracting all Web and
+DNS traffic which isn't served by a more specific route elsewhere in the
+exercise.
+
+5. CORE containers
+
+In addition to acting as a standalone Web and DNS simulator, TopGen
+can run inside a CORE (http://www.nrl.navy.mil/itd/ncs/products/core)
+container. In addition to Web and DNS, using CORE allows us to simulate
+an "Internet Backbone" consisting of several containerized BGP routers.
+A pair of example topologies are included in contrib/core/topo/. One
+example, topgen.imn, allows for self-contained testing where the "user"
+machine is also simulated as a container on the same host which supports
+the TopGen and BGP backbone containers. The other example, greybox.imn,
+allows a second network interface (eth1) on the host machine to link the
+simulated Internet consisting of a TopGen and several BGP containers to
+the rest of the exercise, which is presumably hosted on other machines.
+
+To start a CORE topology, first ensure the core daemon is running by
+launching its service ("systemctl start core-daemon"). Next, log in
+via the GUI and, from a terminal, launch "core-gui", then load one of
+the desired topoloy *.imn files, and click on the green "play" button.
+For detailed instructions on how to operate the CORE environment, please
+consult the manual available at http://www.nrl.navy.mil/itd/ncs/products/core.
+

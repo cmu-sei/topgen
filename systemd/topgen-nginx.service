@@ -1,0 +1,16 @@
+# mostly like nginx (except for a few quirks):
+.include /usr/lib/systemd/system/nginx.service
+
+[Unit]
+# replace original nginx service (can't coexist with it):
+Description=TopGen HTTP (nginx) Service
+Conflicts=nginx.service
+# we need nginx hosts and config file:
+ConditionPathExists=/var/lib/topgen/etc/hosts.nginx
+ConditionPathExists=/var/lib/topgen/etc/nginx.conf
+# loopbacks must be set up (eventually, no need to specify 'After'):
+Wants=topgen-loopback.service
+
+[Service]
+# don't time out if nginx takes a while to load:
+TimeoutSec=0

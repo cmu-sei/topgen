@@ -1,0 +1,20 @@
+# mostly like named (except for a few quirks):
+.include /usr/lib/systemd/system/named.service
+
+[Unit]
+# replace original named service (can't coexist with it):
+Description=TopGen DNS Service
+Conflicts=named.service
+# configuration must be present and loopbacks must be set up:
+After=topgen-named-config.service topgen-loopback.service
+Wants=topgen-named-config.service
+# ensure we're restarted when loopbacks change:
+# (named hates having its listening IPs yanked out, so we can't use Wants here)
+Requires=topgen-loopback.service
+
+[Service]
+# we replace (not append to) ExecStartPre and ExecStart:
+ExecStartPre=
+ExecStartPre=/usr/sbin/named-checkconf -z /var/lib/topgen/etc/named.conf
+ExecStart=
+ExecStart=/usr/sbin/named -u named -c /var/lib/topgen/etc/named.conf

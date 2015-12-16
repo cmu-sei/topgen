@@ -1,0 +1,322 @@
+node n1 {
+    type router
+    model router
+    network-config {
+	hostname Sprint
+	!
+	interface eth0
+	 ip address 10.0.1.1/24
+	!
+	interface eth1
+	 ip address 10.0.3.2/24
+	!
+	interface eth2
+	 ip address 10.0.10.1/24
+	!
+    }
+    canvas c1
+    iconcoords {340 500}
+    labelcoords {340 480}
+    interface-peer {eth0 n2}
+    interface-peer {eth1 n3}
+    interface-peer {eth2 n10}
+    services {zebra BGP vtysh IPForward}
+    custom-config {
+	custom-config-id service:zebra:/usr/local/etc/quagga/Quagga.conf
+	custom-command /usr/local/etc/quagga/Quagga.conf
+	config {
+	interface eth0
+	 ip address 10.0.1.1/24
+	!
+	interface eth1
+	 ip address 10.0.3.2/24
+	!
+	interface eth2
+	 ip address 10.0.10.1/24
+	!
+	router bgp 1
+	 bgp router-id 10.0.1.1
+	 redistribute connected
+	 timers bgp 3 10
+	 neighbor 10.0.1.2 remote-as 2
+	 neighbor 10.0.1.2 next-hop-self
+	 neighbor 10.0.3.1 remote-as 3
+	 neighbor 10.0.3.1 next-hop-self
+	}
+    }
+    custom-config {
+	custom-config-id service:zebra
+	custom-command zebra
+	config {
+	('/usr/local/etc/quagga', '/var/run/quagga')
+	('/usr/local/etc/quagga/Quagga.conf', 'quaggaboot.sh')
+	35
+	('sh quaggaboot.sh zebra',)
+	('killall zebra',)
+	}
+    }
+}
+
+node n2 {
+    type router
+    model router
+    network-config {
+	hostname Level3
+	!
+	interface eth0
+	 ip address 10.0.2.1/24
+	!
+	interface eth1
+	 ip address 10.0.1.2/24
+	!
+	interface eth2
+	 ip address 10.0.20.1/24
+	!
+    }
+    canvas c1
+    iconcoords {560 500}
+    labelcoords {560 480}
+    interface-peer {eth0 n3}
+    interface-peer {eth1 n1}
+    interface-peer {eth2 n20}
+    services {zebra BGP vtysh IPForward}
+    custom-config {
+	custom-config-id service:zebra:/usr/local/etc/quagga/Quagga.conf
+	custom-command /usr/local/etc/quagga/Quagga.conf
+	config {
+	interface eth0
+	 ip address 10.0.2.1/24
+	!
+	interface eth1
+	 ip address 10.0.1.2/24
+	!
+	interface eth2
+	 ip address 10.0.20.1/24
+	!
+	router bgp 2
+	 bgp router-id 10.0.2.1
+	 redistribute connected
+	 timers bgp 3 10
+	 neighbor 10.0.2.2 remote-as 3
+	 neighbor 10.0.2.2 next-hop-self
+	 neighbor 10.0.1.1 remote-as 1
+	 neighbor 10.0.1.1 next-hop-self
+	 neighbor 10.0.20.20 remote-as 20
+	 neighbor 10.0.20.20 next-hop-self
+	}
+    }
+    custom-config {
+	custom-config-id service:zebra
+	custom-command zebra
+	config {
+	('/usr/local/etc/quagga', '/var/run/quagga')
+	('/usr/local/etc/quagga/Quagga.conf', 'quaggaboot.sh')
+	35
+	('sh quaggaboot.sh zebra',)
+	('killall zebra',)
+	}
+    }
+}
+
+node n3 {
+    type router
+    model router
+    network-config {
+	hostname Verisign
+	!
+	interface eth0
+	 ip address 10.0.3.1/24
+	!
+	interface eth1
+	 ip address 10.0.2.2/24
+	!
+    }
+    canvas c1
+    iconcoords {450 585}
+    labelcoords {450 620}
+    interface-peer {eth0 n1}
+    interface-peer {eth1 n2}
+    services {zebra BGP vtysh IPForward}
+    custom-config {
+	custom-config-id service:zebra:/usr/local/etc/quagga/Quagga.conf
+	custom-command /usr/local/etc/quagga/Quagga.conf
+	config {
+	interface eth0
+	 ip address 10.0.3.1/24
+	!
+	interface eth1
+	 ip address 10.0.2.2/24
+	!
+	router bgp 3
+	 bgp router-id 10.0.3.1
+	 redistribute connected
+	 timers bgp 3 10
+	 neighbor 10.0.3.2 remote-as 1
+	 neighbor 10.0.3.2 next-hop-self
+	 neighbor 10.0.2.1 remote-as 2
+	 neighbor 10.0.2.1 next-hop-self
+	}
+    }
+    custom-config {
+	custom-config-id service:zebra
+	custom-command zebra
+	config {
+	('/usr/local/etc/quagga', '/var/run/quagga')
+	('/usr/local/etc/quagga/Quagga.conf', 'quaggaboot.sh')
+	35
+	('sh quaggaboot.sh zebra',)
+	('killall zebra',)
+	}
+    }
+}
+
+node n10 {
+    type rj45
+    network-config {
+	hostname eth1
+	!
+    }
+    canvas c1
+    iconcoords {150 500}
+    labelcoords {150 535}
+    interface-peer {0 n1}
+}
+
+node n20 {
+    type router
+    model host
+    network-config {
+	hostname TopGen
+	!
+	interface eth0
+	 ip address 10.0.20.20/24
+	!
+    }
+    canvas c1
+    iconcoords {800 500}
+    labelcoords {800 545}
+    interface-peer {eth0 n2}
+    services {zebra BGP vtysh DefaultRoute UserDefined}
+    custom-config {
+	custom-config-id service:UserDefined
+	custom-command UserDefined
+	config {
+	dirs=('/var/log/nginx',)
+	files=('TopGenBoot.sh',)
+	cmdup=('sh TopGenBoot.sh start',)
+	cmddown=('sh TopGenBoot.sh stop',)
+	}
+    }
+    custom-config {
+	custom-config-id service:UserDefined:TopGenBoot.sh
+	custom-command TopGenBoot.sh
+	config {
+	#!/bin/sh
+	
+	# TopGen Container start/stop/status (glsomlo@cert.org, Oct. 2015)
+	
+	status() {
+	  pidof nginx && pidof named
+	}
+	
+	start() {
+	  for i in $(cat /var/lib/topgen/etc/hosts.* | awk '{print $1}' | sort -u); do
+	    /usr/sbin/ip addr add $i/32 scope global dev lo
+	  done
+	  /usr/sbin/named -u named -c /var/lib/topgen/etc/named.conf
+	  /usr/sbin/nginx
+	}
+	
+	stop() {
+	  /usr/sbin/nginx -s quit
+	  /usr/sbin/rndc stop
+	  /usr/sbin/ip addr flush scope global dev lo
+	}
+	
+	restart() {
+	  stop
+	  start
+	}
+	
+	case "$1" in
+	  start|stop|restart|status)
+	    $1
+	    ;;
+	  *)
+	    echo "Usage: $0 {start|stop|restart|status}"
+	    exit 2
+	    ;;
+	esac
+	}
+    }
+    custom-config {
+	custom-config-id service:zebra:/usr/local/etc/quagga/Quagga.conf
+	custom-command /usr/local/etc/quagga/Quagga.conf
+	config {
+	interface lo
+	 description loopback
+	interface eth0
+	 ip address 10.0.20.20/24
+	!
+	router bgp 20
+	 bgp router-id 10.0.20.20
+	 neighbor 10.0.20.1 remote-as 2
+	 neighbor 10.0.20.1 default-originate
+	 neighbor 10.0.20.1 distribute-list 10 in
+	!
+	access-list 10 deny any
+	}
+    }
+    custom-config {
+	custom-config-id service:zebra
+	custom-command zebra
+	config {
+	('/usr/local/etc/quagga', '/var/run/quagga')
+	('/usr/local/etc/quagga/Quagga.conf', 'quaggaboot.sh')
+	35
+	('sh quaggaboot.sh zebra',)
+	('killall zebra',)
+	}
+    }
+}
+
+link l1 {
+    nodes {n1 n2}
+}
+
+link l2 {
+    nodes {n2 n3}
+}
+
+link l3 {
+    nodes {n3 n1}
+}
+
+link l10 {
+    nodes {n10 n1}
+}
+
+link l20 {
+    nodes {n2 n20}
+}
+
+canvas c1 {
+    name {Canvas1}
+}
+
+option global {
+    interface_names no
+    ip_addresses yes
+    ipv6_addresses no
+    node_labels yes
+    link_labels yes
+    show_api no
+    background_images no
+    annotations yes
+    grid yes
+    traffic_start 0
+}
+
+option session {
+}
+

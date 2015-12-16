@@ -1,0 +1,27 @@
+
+- add debian/ubuntu package spec
+
+- split out topgen-scrape.sh (or implement sub-commands); these are
+  all potentially very long running operations (e.g., scraping may
+  take weeks), so unexpected things may happen, and resuming manually
+  should be possible without too much overhead:
+	- scraping
+	- certificate generation
+	- vhost IP address resolution
+
+- consider a dedicated topgen-quagga service for announcing a default route
+	- right now, kickstart configures bgpd.conf based on assumptions
+	  including the current default gateway during install
+
+- can we configure topgen-loopback service to shut down when last service
+  depending on it goes away ?
+
+- SELinux policy for topgen-mkdns.sh (right now it calls chcon explicitly)
+
+- add simulated EMAIL (Webmail) services: "Gmail", "Yahoo", etc.
+
+- augment Web and DNS data with (simulated) WHOIS functionality
+
+- integrate with user simulation (GUS ?)
+
+- add simulated TOR containers (when used with core)

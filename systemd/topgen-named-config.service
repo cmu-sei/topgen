@@ -1,0 +1,17 @@
+[Unit]
+Description=TopGen DNS Configuration Service
+# we absolutely need nginx hosts and delegation info:
+ConditionPathExists=/var/lib/topgen/etc/hosts.nginx
+ConditionPathExists=/etc/topgen/delegations.dns
+# start if either of the following is missing: 
+ConditionPathExists=|!/var/lib/topgen/etc/hosts.named
+ConditionPathExists=|!/var/lib/topgen/named/rootsrv
+ConditionPathExists=|!/var/lib/topgen/named/tldsrv
+PartOf=topgen-named.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/sbin/topgen-mkdns.sh -fq
+# just added a bunch of hosts (hosts.named), must condrestart loopback service:
+ExecStart=/usr/bin/systemctl try-restart topgen-loopback.service

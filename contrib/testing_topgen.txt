@@ -1,0 +1,80 @@
+create new VM (consider 256G hdd for full topgen corpus)
+
+set new VM to boot from CD (Fedora-Server-netinst-x86_64-22.iso)
+
+move cursor to "Install Fedora 22", hit <Tab>, and backspace until only
+	"vmlinuz initrd=initrd.img" are left; Then add the following:
+	" ks=http://mirror.ini.cmu.edu/ks/greybox22.ks", so that the
+	boot command line looks like this:
+
+"> vmlinuz initrd=initrd.img ks=http://mirror.ini.cmu.edu/ks/greybox22.ks"
+
+	... then hit <Enter>, and wait until the whole install proces
+	completes (you'll get a message saying "hit any key to reboot").
+
+boot the newly installed machine from hdd (by disconnecting the CD image)
+
+log in as Admin, password tartans@1
+
+open a terminal, and become root: "su -", password is also tartans@1
+
+run "topgen-scrape.sh", which will tell you it needs at least one site
+	listed under /etc/topgen/scrape_sites.txt
+
+edit /etc/topgen/scrape_sites.txt, and uncomment "www.wikipedia.org"
+
+re-run "topgen-scrape.sh" and wait for a few (approx. 15) minutes while
+	it scrapes wikipedia, issues a root CA, signs all vhosts, collects
+	their IP addresses, etc.
+
+	The collected (vhosts) and generated (certs, etc) content will
+	be located under /var/lib/topgen/<...> (which is where you should
+	unpack the 133Gig worth of data available on babette)
+
+run "systemctl start topgen-nginx topgen-named" which will start nginx,
+	as well as named (and generate the named configuration data from
+	the available nginx vhosts if needed), configure IPs on the loopback,
+	etc.
+
+	At this point you should be able to see www.wikipedia.org,
+	topgen.info, and the DNS servers (8.8.8.8 in particular) being
+	local (on the loopback interface). So all DNS is resolved by
+	the local topgen-named, and the two web sites mentioned above
+	will be served by the local topgen-nginx.
+
+open firefox, and navigate to "topgen.info" where you'll notice a few
+	links (to access topgen.info via https, to download the topgen
+	CA cert, and to access the list of scraped sites, which at this
+	point probably only include wikipedia.org).
+
+download and install the CA certificate, then switch to the https version
+	of topgen.info, visit wikipedia.org by following the link, etc.
+
+shut down topgen by running "systemctl stop topgen*", which will include
+	shutting down the loopback configuration (i.e. will remove all
+	secondary loopback IPs from the "lo" interface).
+
+	At this point your test VM should be "back to normal" in terms of
+	networking.
+
+start core-daemon ("systemctl start core-daemon"), then fire up core-gui
+	from a regular (non-root) Administrator shell window.
+
+load and launch /usr/share/doc/topgen/contrib/core_topo/topgen.imn
+	rather than navigating the open-file dialog in core-gui, you can
+	start it by mentioning the imn file directly on the command line:
+
+"core-gui /usr/share/doc/topgen/contrib/core_topo/topgen.imn"
+
+open a shell window on the User container, and traceroute to topgen,
+	resolve www.wikipedia.org in DNS, load it in lynx, etc to test
+	greybox containers locally. (the file
+	/usr/share/doc/topgen/contrib/core_topo/topgen.imn contains the
+	same topology but with an "eth1" connection to an external
+	exercise setup, but will need to be edited to reflect your
+	second physical ethernet connection, which may be "ens33" instead
+	of "eth1", depending on your emulated hardware, before it could
+	be successfully started).
+
+Enjoy,
+--Gabe

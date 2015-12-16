@@ -1,0 +1,13 @@
+[Unit]
+Description=TopGen Loopback Interface Secondary IP Configuration Service
+After=network.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+# systemd doesn't support compound commands, so we cheat a little:
+ExecStart=/usr/bin/sh -c "for i in $(cat /var/lib/topgen/etc/hosts.* | awk '{print $1}' | sort -u); do ip addr add $i/32 scope global dev lo; done"
+ExecStop=/usr/sbin/ip addr flush scope global dev lo
+
+[Install]
+WantedBy=multi-user.target

@@ -186,7 +186,7 @@ comm -12 <(ls -1 $TOPGEN_VHOSTS) \
 	    Below is a list of Web sites mirrored for this simulation:
 	    <ul>
 	EOT
-  for VH in $(cat "$TOPGEN_SITE/orig_vhosts.txt"); do
+  for VH in $(< "$TOPGEN_SITE/orig_vhosts.txt"); do
     echo "    <li><a href=\"//$VH\">$VH</a>"
   done
   cat <<- "EOT"
@@ -305,8 +305,8 @@ for VH in $TOPGEN_VHOSTS/*; do
 
   # resolve vhost DNS IP address, write to hosts.nginx
   VHIP=$(getent ahostsv4 $VB | head -1 | cut -d' ' -f1)
-  [ -n "$VHIP" ] || VHIP='0.64.83.76' # made-up IP for unresolvable vhosts
-  echo "$VHIP $VB" >> "$TOPGEN_VARETC/hosts.nginx"
+  # use made-up IP '0.64.83.76' for unresolvable vhosts:
+  echo "${VHIP:-'0.64.83.76'} $VB" >> "$TOPGEN_VARETC/hosts.nginx"
 done
 
 # done with CA directory:

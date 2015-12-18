@@ -193,14 +193,26 @@ sed -i '/^    server {/,/^    }/s/^/#/' /etc/nginx/nginx.conf
 # NOTE: topgen content to be either restored manually or scraped in-place
 #        to /var/lib/topgen/...
 
-# auto-start greybox core topoloy if available:
-# (copy /usr/share/doc/topgen/contrib/greybox.imn to /etc/topgen, and customize)
-#
-cat >> /etc/rc.d/rc.local <<- "EOT"
+# auto-start CORE topoloy if available:
+# (must still be enabled explicitly);
+# (cp /usr/share/doc/topgen/contrib/core_topo/... /etc/topgen/default.imn
+#  and customize before enabling service).
+cat > /etc/systemd/system/core-topo.service <<- "EOT"
+	[Unit]
+	Description=CORE Topology Starter
+	ConditionPathExists=/etc/topgen/default.imn
+	After=core-daemon.service
+	# NOTE: "Requires", not just "Wants":
+	Requires=core-daemon.service
 
-	# start GreyBox topology in CORE, if available:
-	[ -s /etc/topgen/topgen.imn ] &&
-	  su -l admin -c 'core-gui --batch /etc/topgen/topgen.imn'
+	[Service]
+	Type=oneshot
+	RemainAfterExit=yes
+	ExecStart=/usr/bin/sh -c "core-gui --batch /etc/topgen/default.imn | grep -o 'Session id is [[:digit:]]*' | cut -d' ' -f1-3 --complement > /run/core-topo.sid"
+	ExecStop=/usr/bin/sh -c "core-gui -c $(< /run/core-topo.sid); rm -f /run/core-topo.sid"
+
+	[Install]
+	WantedBy=multi-user.target
 	EOT
 
 %end

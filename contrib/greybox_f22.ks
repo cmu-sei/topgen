@@ -113,7 +113,7 @@ rpm -e xpad
 sed -i '/^\[main\]/a dns=none' /etc/NetworkManager/NetworkManager.conf
 # replace all nameservers in resolv.conf "google cache" addresses:
 sed -i '/^nameserver/d' /etc/resolv.conf
-cat > /etc/resolv.conf <<- "EOT"
+cat >> /etc/resolv.conf <<- "EOT"
 	nameserver 8.8.4.4
 	nameserver 8.8.8.8
 	EOT

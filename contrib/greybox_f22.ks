@@ -56,16 +56,15 @@ logwatch
 minicom
 sipcalc
 wireshark
+lynx # web client for text-mode testing
 
 # basic graphical lxde desktop (for core-gui):
 @base-x # for lxde-desktop (core-gui)
 @lxde-desktop # for core-gui
+-xpad # brought in by lxde, annoying
+-xscreensaver* # brought in by lxde, annoying
 dejavu-sans-mono-fonts # for lxde-desktop (core-gui)
--xscreensaver* # lxde pulls them in, and annoyingly starts them by default
-
-# web clients for troubleshooting topgen:
-lynx
-firefox
+firefox # web client for graphics-mode testing
 
 # required (but not explicitly via rpm) by core:
 quagga
@@ -100,6 +99,7 @@ chmod 755 /etc/rc.d/rc.local
 
 # remove xscreensaver-* (BZ 1199868, should be fixed in F23)
 rpm -e $(rpm -qa | grep xscreensaver)
+rpm -e xpad
 
 
 ### TopGen & GreyBox Setup

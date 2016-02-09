@@ -9,10 +9,6 @@
 	- certificate generation
 	- vhost IP address resolution
 
-- consider a dedicated topgen-quagga service for announcing a default route
-	- right now, kickstart configures bgpd.conf based on assumptions
-	  including the current default gateway during install
-
 - can we configure topgen-loopback service to shut down when last service
   depending on it goes away ?
 

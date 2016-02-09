@@ -41,16 +41,16 @@ stage, TopGen Web and DNS functionality can be tested locally.
 
 4. Routing (quagga/bgpd)
 
-To act as a universal Web (and DNS) server to the rest of the machines
-in an exercise, the host running TopGen must announce a default BGP
-route. The include example kickstart file (contrib/greybox_f22.ks) will
-automatically create a BGP configuration assuming the default gateway
-used during the install to be the BGP peer. Edit /etc/quagga/bgpd.conf
-to modify parameters as needed (BGP peer IP address, AS number, etc.).
-Once BGP is configured, starting the bgpd service ("systemctl start bgpd")
-will begin announcing a default route into BGP, attracting all Web and
-DNS traffic which isn't served by a more specific route elsewhere in the
-exercise.
+To act as a universal Web (and DNS, Email, etc.) server to the rest of
+the machines in an exercise, TopGen must be the default Internet route
+for the entire exercise. It is the responsibility of TopGen's "ISP" router
+to announce a default route with nexthop pointing at TopGen. In the
+GreyBox configuration, this will be another (Quagga-router) container; in
+standalone TopGen mode, it will be another VM, dedicated to operating as
+TopGen's upstream router.
+TopGen itself does not itself run any routing software (any more -- it
+used to in earlier configurations, but keeping routing separate from
+application-level virtualization was found to make for a cleaner setup).
 
 5. CORE containers
 

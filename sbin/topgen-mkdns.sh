@@ -49,6 +49,7 @@ QUIET_GEN='no'
 
 # Caching servers (for use in view match, and to ensure existence of A records):
 declare -A CACHING_NS=(
+  ['b.resolvers.level3.net']='4.2.2.2'
   ['google-public-dns-a.google.com']='8.8.8.8'
   ['google-public-dns-b.google.com']='8.8.4.4'
 )

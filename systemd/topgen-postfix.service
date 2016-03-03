@@ -1,0 +1,12 @@
+# mostly like postfix (except for a few quirks):
+.include /usr/lib/systemd/system/postfix.service
+
+[Unit]
+Description=TopGen (Postfix-based) smtp server
+Conflicts=postfix.service
+ConditionPathExists=/var/lib/topgen/etc/postfix/main.cf
+ConditionPathExists=/var/lib/topgen/etc/postfix/master.cf
+Wants=topgen-loopback.service
+
+[Service]
+Environment="MAIL_CONFIG=/var/lib/topgen/etc/postfix"

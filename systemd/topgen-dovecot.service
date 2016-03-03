@@ -1,0 +1,29 @@
+.include /usr/lib/systemd/system/dovecot.service
+
+# If you want to pass additionally command line options to the dovecot
+# binary, create the file:
+# 	`/etc/systemd/system/dovecot.service.d/service.conf'.
+# In this file create a Service section and configure an Environment with
+# the variable `OPTIONS'. For example:
+#
+#	[Service]
+#	Environment='OPTIONS=-p'
+#
+# In the `Service' section you may also specify various other setting.
+# If you have trouble with `Too many open files' you may set:
+#LimitNOFILE=8192
+#
+# If you want to allow the Dovecot services to produce core dumps, use:
+#LimitCORE=infinity
+
+[Unit]
+Description=TopGen (Dovecot-based) IMAP server
+Conflicts=dovecot.service
+ConditionPathExists=/var/lib/topgen/etc/postfix/dovecot.conf
+Wants=topgen-loopback.service
+
+[Service]
+ExecStart=
+ExecStart=/usr/sbin/dovecot -F -c /var/lib/topgen/etc/postfix/dovecot.conf
+ExecReload=
+ExecReload=/usr/sbin/dovecot -c /var/lib/topgen/etc/postfix/dovecot.conf reload

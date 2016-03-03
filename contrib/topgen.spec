@@ -1,5 +1,5 @@
 Name: topgen
-Version: 0.0.1
+Version: 0.0.2
 Release: 1%{?dist}
 Summary: TopGen Exercise Internet Simulator
 License: BSD
@@ -10,6 +10,7 @@ Requires(preun): systemd-units
 Requires(postun): systemd-units
 Requires: coreutils, gawk, grep, sed, openssl, iproute
 Requires: bind, nginx, wget >= 1.17.1
+Requires: dovecot, postfix
 BuildRequires: systemd-units
 BuildArch: noarch
 
@@ -28,10 +29,11 @@ install -d %{buildroot}/%{_unitdir}
 install -d %{buildroot}/%{_sbindir}
 install -d %{buildroot}/%{_sysconfdir}/nginx/conf.d
 install -d %{buildroot}/%{_sysconfdir}/%{name}
-install -d %{buildroot}/%{_localstatedir}/lib/%{name}/etc
+install -d %{buildroot}/%{_localstatedir}/lib/%{name}/etc/postfix
 install -d %{buildroot}/%{_localstatedir}/lib/%{name}/vhosts
 install -d %{buildroot}/%{_localstatedir}/lib/%{name}/certs
 install -d %{buildroot}/%{_localstatedir}/lib/%{name}/named
+install -d %{buildroot}/%{_localstatedir}/lib/%{name}/vmail
 %{__ln_s} %{_localstatedir}/lib/%{name}/etc/nginx.conf \
           %{buildroot}%{_sysconfdir}/nginx/conf.d/topgen.conf
 install -m 0644 -t %{buildroot}/%{_unitdir} systemd/*
@@ -59,15 +61,21 @@ install -m 0644 -t %{buildroot}/%{_sysconfdir}/%{name} etc/*
 %dir %{_sysconfdir}/%{name}
 %config(noreplace) %{_sysconfdir}/%{name}/scrape_sites.txt
 %config(noreplace) %{_sysconfdir}/%{name}/delegations.dns
+%config(noreplace) %{_sysconfdir}/%{name}/vmail.cfg
 # topgen scripts:
 %{_sbindir}/topgen*
 # (initially empty) directory structure for storing topgen data:
 %dir %{_localstatedir}/lib/%{name}
 %dir %{_localstatedir}/lib/%{name}/etc
+%dir %{_localstatedir}/lib/%{name}/etc/postfix
 %dir %{_localstatedir}/lib/%{name}/vhosts
 %dir %{_localstatedir}/lib/%{name}/certs
 %dir %{_localstatedir}/lib/%{name}/named
+%dir %attr (0700, dovenull, dovenull) %{_localstatedir}/lib/%{name}/vmail
 
 %changelog
-* Tue Dec 15 2015 Gabriel Somlo <glsomlo at cert.org> 0.0.0.1-1
+* Thu Mar 03 2016 Gabriel Somlo <glsomlo at cert.org> 0.0.2-1
+- updated to 0.0.2 (with support for virtual email services)
+
+* Tue Dec 15 2015 Gabriel Somlo <glsomlo at cert.org> 0.0.1-1
 - initial fedora package

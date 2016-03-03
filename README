@@ -29,7 +29,18 @@ a list of delegations (/etc/topgen/delegations.dns) for forward 2nd-level
 domains and reverse /24 networks, in case the exercise being supported
 contains authoritative DNS service for its own domain(s) and network(s).
 
-3. Systemd (service startup)
+3. Email
+
+Given a set of domains, each with a mail server and a list of users, we
+generate the appropriate virtual email servers with the ability to handle
+smtp (via postfix) and imap (via dovecot) using /usr/sbin/topgen-vmail.sh.
+The DNS generator ensures that the appropriate MX records are added for
+each domain. NOTE: if an enclave needs to host its own email domain, it
+MUST also run its own authoritative DNS server (listed in
+/etc/topgen/delegations.dns, as explained in Sec. 2), to be able to
+provide the appropriate MX record for its domain.
+
+4. Systemd (service startup)
 
 After scraping the list of desired Web vhosts (or installing the Web
 content manually under /var/lib/topgen/<...>), start the topgen-nginx
@@ -38,8 +49,10 @@ service ("systemctl start topgen-dns"). All Web vhost (and virtual DNS
 server) IP addresses will be configured as secondaries on the loopback
 interface (and DNS configuration will be created on demand). At this
 stage, TopGen Web and DNS functionality can be tested locally.
+To start the virtual email domains, start both the topgen-postfix and
+topgen-dovecot systemd services.
 
-4. Routing (quagga/bgpd)
+5. Routing (quagga/bgpd)
 
 To act as a universal Web (and DNS, Email, etc.) server to the rest of
 the machines in an exercise, TopGen must be the default Internet route
@@ -52,7 +65,7 @@ TopGen itself does not itself run any routing software (any more -- it
 used to in earlier configurations, but keeping routing separate from
 application-level virtualization was found to make for a cleaner setup).
 
-5. CORE containers
+6. CORE containers
 
 In addition to acting as a standalone Web and DNS simulator, TopGen
 can run inside a CORE (http://www.nrl.navy.mil/itd/ncs/products/core)

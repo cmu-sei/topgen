@@ -23,7 +23,10 @@
 # mistakes are simply TOO easy to make :)
 
 # input hosts file (<ip_addr fqdn> for all virtual Web hosts)::
-SRC_HOSTS='/var/lib/topgen/etc/hosts.nginx'
+SRC_WHOSTS='/var/lib/topgen/etc/hosts.nginx'
+
+# input hosts file (<ip_addr fqdn> for all virtual mail servers)::
+SRC_MHOSTS='/var/lib/topgen/etc/hosts.vmail'
 
 # input delegations file (hashes to be sourced into our namespace):
 SRC_DELEG='/etc/topgen/delegations.dns'
@@ -88,10 +91,14 @@ Usage:  $0 [-l <web_hosts>] [-d <delegations>] \\
 
 The optional command line arguments are:
 
-    -l <web_hosts>   name of the input hosts list containing <ip_addr fqdn>
+    -w <web_hosts>   name of the input hosts list containing <ip_addr fqdn>
                      pairs of all virtual Web TopGen hosts to be hosted by
                      the web server;
-                     (default: $SRC_HOSTS).
+                     (default: $SRC_WHOSTS).
+
+    -m <web_hosts>   name of the input hosts list containing <ip_addr fqdn>
+                     pairs of all of TopGen's virtual mail servers;
+                     (default: $SRC_MHOSTS).
 
     -d <delegations> name of the input file containing hashes associating
                      delegated forward 2nd-level domains and reverse /24
@@ -127,10 +134,13 @@ delegation target name servers.
 
 # process command line options (overriding any defaults, or '-h'):
 OPTIND=1
-while getopts "l:d:n:c:z:fqh?" OPT; do
+while getopts "w:m:d:n:c:z:fqh?" OPT; do
   case "$OPT" in
-  l)
-    SRC_HOSTS=$OPTARG
+  w)
+    SRC_WHOSTS=$OPTARG
+    ;;
+  m)
+    SRC_MHOSTS=$OPTARG
     ;;
   d)
     SRC_DELEG=$OPTARG
@@ -168,10 +178,10 @@ $USAGE_BLURB
   exit 1
 }
 
-# assert existence of $SRC_HOSTS and $SRC_DELEG files, and $NAMED_ZD folder:
-[ -s "$SRC_HOSTS" -a -s "$SRC_DELEG" -a -d "$NAMED_ZD" ] || {
+# assert existence of $SRC_WHOSTS and $SRC_DELEG files, and $NAMED_ZD folder:
+[ -s "$SRC_WHOSTS" -a -s "$SRC_DELEG" -a -d "$NAMED_ZD" ] || {
   echo "
-ERROR: files \"$SRC_HOSTS\", \"$SRC_DELEG\", and
+ERROR: files \"$SRC_WHOSTS\", \"$SRC_DELEG\", and
        folder \"$NAMED_ZD\" MUST exist
        before running this command!
 
@@ -209,8 +219,15 @@ mkdir $TLD_ZD
 # associative array (hash) with key=fqdn and value=ip_addr for each host
 declare -A HOSTS_LIST
 
-# grab hosts in $SRC_HOSTS, skipping & warning on collision with delegations:
-while read IPADDR FQDN; do
+# assoc. array (hash) with key=domain and value=mx_hostname for each domain
+declare -A DOMAIN_MX
+
+# check that a host is not delegated, and insert it into HOSTS_LIST hash
+# also insert into DOMAIN_MX array if $IS_MX is "true"
+function hosts_list_add {
+  IPADDR=$1
+  FQDN=$2
+  IS_MX=$3
 
   # parse TLD (last dot-separated segment of FQDN):
   TLD=${FQDN##*.}
@@ -225,7 +242,7 @@ while read IPADDR FQDN; do
     [ "$SLD.$TLD" = "$DOM" ] && {
       [ "$QUIET_GEN" == "no" ] && echo "
 WARNING: skipping host $FQDN in delegated domain $DOM"
-      continue 2
+      return
     }
   done
 
@@ -234,20 +251,35 @@ WARNING: skipping host $FQDN in delegated domain $DOM"
     [ "${IPADDR%.*}" = "$NET" ] && {
       [ "$QUIET_GEN" == "no" ] && echo "
 WARNING: skipping host $FQDN: ip $IPADDR in delegated network $NET"
-      continue 2
+      return
     }
   done
 
   # add host to HOSTS_LIST hash:
   HOSTS_LIST[$FQDN]=$IPADDR
 
-done < $SRC_HOSTS # end "while read IPADDR FQDN" from $SRC_HOSTS
+  # is this an MX server?
+  [ "$IS_MX" == "true" ] && DOMAIN_MX[$SLD.$TLD]+=" $FQDN"
+}
+
+
+# grab hosts in $SRC_WHOSTS, skipping & warning on collision with delegations:
+while read IPADDR FQDN; do
+  hosts_list_add $IPADDR $FQDN false
+done < $SRC_WHOSTS
+
+# grab hosts in $SRC_MHOSTS, skipping & warning on collision with delegations:
+# NOTE: also make sure these get added as MX records for their domain
+[ -s $SRC_MHOSTS ] && while read IPADDR FQDN; do
+  hosts_list_add $IPADDR $FQDN true
+done < $SRC_MHOSTS
+
 
 # unconditionally add all delegations' designated name servers:
 for NS in "${!DELEGATIONS_NS[@]}"; do
   [ -n "${HOSTS_LIST[$NS]}" ] && {
     [ "$QUIET_GEN" == "no" ] && echo "
-WARNING: Delegation name server $NS already in $SRC_HOSTS!
+WARNING: Delegation name server $NS already in $SRC_WHOSTS!
          (old address ${HOSTS_LIST[$NS]}, using ${DELEGATIONS_NS[$NS]})"
   }
   HOSTS_LIST[$NS]=${DELEGATIONS_NS[$NS]}
@@ -407,7 +439,7 @@ cat >> $ROOT_ZONE << "EOT"
 EOT
 
 
-# header for regular (tld) zone files (for use within loop across $SRC_HOSTS)
+# header for regular (tld) zone files
 TLD_ZONE_HDR=$(
   cat <<- "EOT"
 	$TTL 300
@@ -521,6 +553,21 @@ for NET in "${!DELEGATIONS_REV[@]}"; do
 done # for NET in "${!DELEGATIONS_REV[@]}"
 
 
+# add MX records for all vmail domains:
+for DOM in "${!DOMAIN_MX[@]}"; do
+
+  # parse TLD (last dot-separated segment of DOM):
+  TLD=${DOM##*.}
+
+  # add MX record for each of DOM's designated name servers:
+  ensure_exists_forward $TLD
+  for MX in ${DOMAIN_MX[$DOM]}; do
+    echo -e "${DOM%.*}\tMX\t10\t$MX." >> $TLD_ZD/$TLD.zone
+  done
+
+done # for DOM in "${!DELEGATIONS_FWD[@]}"
+
+
 # close out named.conf:
 echo '};' >> $NAMED_CONF
 
@@ -529,7 +576,8 @@ echo '};' >> $NAMED_CONF
 SUCCESS_BLURB="
 SUCCESS: bind9 configuration generated based on the following inputs:
 
-    Web hosts:   $SRC_HOSTS
+    Web hosts:   $SRC_WHOSTS
+    Mail srvrs:  $([ -s $SRC_MHOSTS ] && echo $SRC_MHOSTS)
     Delegations: $SRC_DELEG
 
 Output was written to the following locations:

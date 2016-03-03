@@ -1,0 +1,35 @@
+#############################################################################
+# NOTE:
+# 1. Before running mutt in a container, run:
+#      export TERM=vt100 HOME=$(pwd)
+# 2. For a different user/password/mailserver/domain, use:
+#      sed -i 's/user1/user2/g; s/tartans1/tar2tans/g' .muttrc
+#      sed -i 's/mx/mail/g; s/foo.org/bar.com/g' .muttrc
+#############################################################################
+
+# systemwide configuration for default settings:
+source /etc/Muttrc
+
+# override defaults for personalized settings:
+set header_cache="~/.mutthdr"
+set sort=mailbox-order
+set folder_format="%2C %3N %f"
+set use_envelope_from=yes
+set fast_reply=yes
+set edit_headers=yes
+set editor="/usr/bin/vi -c 'set textwidth=70'"
+set ssl_force_tls=yes
+set certificate_file="~/.muttcrt"
+
+# default folder to open on startup:
+set folder=imaps://user1@mx.foo.org
+set spoolfile=+INBOX
+
+# account settings:
+folder-hook imaps://user1@mx.foo.org 'set \
+  imap_pass=tartans1 \
+  folder=imaps://user1@mx.foo.org \
+  from="user1 <user1@foo.org>" \
+  postponed=+INBOX.Drafts \
+  record="+INBOX.Sent Mail" \
+  smtp_url=smtp://user1:tartans1@mx.foo.org:587'

@@ -23,7 +23,7 @@ user --name='admin' --password='tartans@1'
 network --hostname greybox.topgen.info
 
 # services:
-services --disabled=abrtd,avahi_daemon --enabled=sendmail
+services --disabled=abrtd,avahi_daemon
 
 ignoredisk --only-use=vda
 bootloader --location=mbr --boot-drive=vda
@@ -46,17 +46,17 @@ repo --name=GLS --baseurl=http://mirror.ini.cmu.edu/gls/22/x86_64/
 %packages
 # bare-bones Fedora install:
 @core
-@mail-server
 @standard
 @system-tools
 expect
 inotify-tools
 iperf
-logwatch
 minicom
 sipcalc
 wireshark
 lynx # web client for text-mode testing
+mailx # plaintext mail client for testing
+mutt # imamp/smtp client for text-mode testing
 
 # basic graphical lxde desktop (for core-gui):
 @base-x # for lxde-desktop (core-gui)

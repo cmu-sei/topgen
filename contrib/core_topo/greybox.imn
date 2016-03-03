@@ -524,24 +524,32 @@ node n32 {
 	# TopGen Container start/stop/status (glsomlo@cert.org, Oct. 2015)
 
 	status() {
-	  pidof nginx && pidof named
+	  pidof named && pidof nginx && pidof master && pidof dovecot
 	}
 
 	start() {
 	  for i in $(cat /var/lib/topgen/etc/hosts.* | awk '{print $1}' | sort -u); do
 	    /usr/sbin/ip addr add $i/32 scope global dev lo
 	  done
-	  /usr/sbin/named -u named -c /var/lib/topgen/etc/named.conf
-	  /usr/sbin/nginx
-	  /usr/sbin/postfix -c /var/lib/topgen/etc/postfix start
-	  /usr/sbin/dovecot -c /var/lib/topgen/etc/postfix/dovecot.conf
+	  [ -s /var/lib/topgen/etc/named.conf ] && \
+	    /usr/sbin/named -u named -c /var/lib/topgen/etc/named.conf
+	  [ -s /var/lib/topgen/etc/nginx.conf ] && \
+	    /usr/sbin/nginx
+	  [ -s /var/lib/topgen/etc/postfix/main.cf ] && \
+	    /usr/sbin/postfix -c /var/lib/topgen/etc/postfix start
+	  [ -s /var/lib/topgen/etc/postfix/dovecot.conf ] && \
+	    /usr/sbin/dovecot -c /var/lib/topgen/etc/postfix/dovecot.conf
 	}
 
 	stop() {
-	  /usr/sbin/dovecot -c /var/lib/topgen/etc/postfix/dovecot.conf stop
-	  /usr/sbin/postfix -c /var/lib/topgen/etc/postfix stop
-	  /usr/sbin/nginx -s quit
-	  /usr/sbin/rndc stop
+	  pidof dovecot && \
+	    /usr/sbin/dovecot -c /var/lib/topgen/etc/postfix/dovecot.conf stop
+	  pidof master && \
+	    /usr/sbin/postfix -c /var/lib/topgen/etc/postfix stop
+	  pidof nginx && \
+	    /usr/sbin/nginx -s quit
+	  pidof named && \
+	    /usr/sbin/rndc stop
 	  /usr/sbin/ip addr flush scope global dev lo
 	}
 

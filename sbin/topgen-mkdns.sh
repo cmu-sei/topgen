@@ -22,10 +22,13 @@
 # to check for consistency across the three hashes, if it turns out that
 # mistakes are simply TOO easy to make :)
 
-# input hosts file (<ip_addr fqdn> for all virtual Web hosts)::
+# input hosts file (<ip_addr fqdn> for all virtual Web hosts):
 SRC_WHOSTS='/var/lib/topgen/etc/hosts.nginx'
 
-# input hosts file (<ip_addr fqdn> for all virtual mail servers)::
+# additional input hosts files (<ip_addr fqdn>):
+SRC_XHOSTS=''
+
+# input hosts file (<ip_addr fqdn> for all virtual mail servers):
 SRC_MHOSTS='/var/lib/topgen/etc/hosts.vmail'
 
 # input delegations file (hashes to be sourced into our namespace):
@@ -86,7 +89,7 @@ declare -A ROOT_NS=(
 
 # usage blurb (to be printed with error messages):
 USAGE_BLURB="
-Usage:  $0 [-l <web_hosts>] [-d <delegations>] \\
+Usage:  $0 [-w <web_hosts>] [-m <mail_hosts>] [-d <delegations>] \\
                        [-n <dns_hosts>] [-c <named_conf>] [-z <zone_folder>]
 
 The optional command line arguments are:
@@ -96,7 +99,11 @@ The optional command line arguments are:
                      the web server;
                      (default: $SRC_WHOSTS).
 
-    -m <web_hosts>   name of the input hosts list containing <ip_addr fqdn>
+    -x <xtra_hosts>  name of additional hosts list(s) containing <ip_addr fqdn>
+                     mappings to be resolved by the DNS infrastructure;
+                     (default: <empty>).
+
+    -m <mail_hosts>  name of the input hosts list containing <ip_addr fqdn>
                      pairs of all of TopGen's virtual mail servers;
                      (default: $SRC_MHOSTS).
 
@@ -134,10 +141,13 @@ delegation target name servers.
 
 # process command line options (overriding any defaults, or '-h'):
 OPTIND=1
-while getopts "w:m:d:n:c:z:fqh?" OPT; do
+while getopts "w:x:m:d:n:c:z:fqh?" OPT; do
   case "$OPT" in
   w)
     SRC_WHOSTS=$OPTARG
+    ;;
+  x)
+    SRC_XHOSTS=$OPTARG
     ;;
   m)
     SRC_MHOSTS=$OPTARG
@@ -263,14 +273,19 @@ WARNING: skipping host $FQDN: ip $IPADDR in delegated network $NET"
 }
 
 
-# grab hosts in $SRC_WHOSTS, skipping & warning on collision with delegations:
+# grab hosts in $SRC_[W|X]HOSTS, skip & warn on collision with delegations:
+#cat $SRC_WHOSTS $SRC_XHOSTS | while read IPADDR FQDN; do
 while read IPADDR FQDN; do
   hosts_list_add $IPADDR $FQDN false
 done < $SRC_WHOSTS
 
+[ -n "$SRC_XHOSTS" -a -s "$SRC_XHOSTS" ] && while read IPADDR FQDN; do
+  hosts_list_add $IPADDR $FQDN false
+done < $SRC_XHOSTS
+
 # grab hosts in $SRC_MHOSTS, skipping & warning on collision with delegations:
 # NOTE: also make sure these get added as MX records for their domain
-[ -s $SRC_MHOSTS ] && while read IPADDR FQDN; do
+[ -s "$SRC_MHOSTS" ] && while read IPADDR FQDN; do
   hosts_list_add $IPADDR $FQDN true
 done < $SRC_MHOSTS
 
@@ -462,7 +477,7 @@ TLD_ZONE_HDR=$(
 
 # verify existence of forward zone, creating it if necessary:
 function ensure_exists_forward
-  if [ ! -s $TLD_ZD/$1.zone ]; then
+  if [ ! -s "$TLD_ZD/$1.zone" ]; then
     # create forward zone file, paste generic header:
     echo "$TLD_ZONE_HDR" > $TLD_ZD/$1.zone
 
@@ -484,7 +499,7 @@ EOT
 
 # verify existence of reverse zone, creating it if necessary:
 function ensure_exists_reverse
-  if [ ! -s $TLD_ZD/$1.zone ]; then
+  if [ ! -s "$TLD_ZD/$1.zone" ]; then
     # create reverse zone file, paste generic header:
     echo "$TLD_ZONE_HDR" > $TLD_ZD/$1.zone
 
@@ -577,7 +592,8 @@ SUCCESS_BLURB="
 SUCCESS: bind9 configuration generated based on the following inputs:
 
     Web hosts:   $SRC_WHOSTS
-    Mail srvrs:  $([ -s $SRC_MHOSTS ] && echo $SRC_MHOSTS)
+    Xtra hosts:  $([ -n "$SRC_XHOSTS" -a -s "$SRC_XHOSTS" ] && echo $SRC_XHOSTS)
+    Mail srvrs:  $([ -s "$SRC_MHOSTS" ] && echo $SRC_MHOSTS)
     Delegations: $SRC_DELEG
 
 Output was written to the following locations:

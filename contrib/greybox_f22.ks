@@ -71,6 +71,7 @@ quagga
 
 gls-release # FIXME: move to an official repository before publication
 topgen
+keepalived # required by topgen/greybox core topology
 core-daemon
 core-gui
 %end

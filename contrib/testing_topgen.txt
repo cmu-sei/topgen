@@ -31,6 +31,14 @@ re-run "topgen-scrape.sh" and wait for a few (approx. 15) minutes while
 	be located under /var/lib/topgen/<...> (which is where you should
 	unpack the 133Gig worth of data available on babette)
 
+	Alternatively, manually unpack pre-scraped content, which should
+	result in the following destinations being populated:
+
+		/var/lib/topgen/vhosts/*
+		/var/lib/topgen/certs/*
+		/var/lib/topgen/etc/hosts.nginx
+		/var/lib/topgen/etc/topgen_[ca|vh].[key|cer]
+
 run "systemctl start topgen-nginx topgen-named" which will start nginx,
 	as well as named (and generate the named configuration data from
 	the available nginx vhosts if needed), configure IPs on the loopback,
@@ -59,6 +67,11 @@ shut down topgen by running "systemctl stop topgen*", which will include
 
 start core-daemon ("systemctl start core-daemon"), then fire up core-gui
 	from a regular (non-root) Administrator shell window.
+
+optionally re-run the DNS generator to include mappings for point-to-point
+	interfaces of all BGP routers in the topology:
+
+"topgen-mkdns.sh -x /usr/share/doc/topgen/contrib/core_topo/hosts.backbone -f"
 
 load and launch /usr/share/doc/topgen/contrib/core_topo/topgen.imn
 	rather than navigating the open-file dialog in core-gui, you can

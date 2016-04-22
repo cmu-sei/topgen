@@ -56,14 +56,14 @@ topgen-dovecot systemd services.
 
 To act as a universal Web (and DNS, Email, etc.) server to the rest of
 the machines in an exercise, TopGen must be the default Internet route
-for the entire exercise. It is the responsibility of TopGen's "ISP" router
-to announce a default route with nexthop pointing at TopGen. In the
-GreyBox configuration, this will be another (Quagga-router) container; in
-standalone TopGen mode, it will be another VM, dedicated to operating as
-TopGen's upstream router.
-TopGen itself does not itself run any routing software (any more -- it
-used to in earlier configurations, but keeping routing separate from
-application-level virtualization was found to make for a cleaner setup).
+for the entire exercise. It is the responsibility of other routers in
+the topology to announce at least a default route pointing at TopGen.
+In the GreyBox configuration, this will be another (Quagga-router)
+container; in standalone TopGen mode, it will be another VM, dedicated
+to operating as TopGen's upstream router.
+TopGen itself no longer runs any routing software. It sends return
+traffic out via its default gateway, which also needs to be provided
+by (at least one of) the other routers in the topology.
 
 6. CORE containers
 
@@ -71,7 +71,7 @@ In addition to acting as a standalone Web and DNS simulator, TopGen
 can run inside a CORE (http://www.nrl.navy.mil/itd/ncs/products/core)
 container. In addition to Web and DNS, using CORE allows us to simulate
 an "Internet Backbone" consisting of several containerized BGP routers.
-A pair of example topologies are included in contrib/core/topo/. One
+A pair of example topologies are included in contrib/core_topo/. One
 example, topgen.imn, allows for self-contained testing where the "user"
 machine is also simulated as a container on the same host which supports
 the TopGen and BGP backbone containers. The other example, greybox.imn,

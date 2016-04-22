@@ -12,9 +12,7 @@
 - can we configure topgen-loopback service to shut down when last service
   depending on it goes away ?
 
-- SELinux policy for topgen-mkdns.sh (right now it calls chcon explicitly)
-
-- add simulated EMAIL (Webmail) services: "Gmail", "Yahoo", etc.
+- SELinux policy for sbin scripts (right now calling chcon explicitly)
 
 - augment Web and DNS data with (simulated) WHOIS functionality
 

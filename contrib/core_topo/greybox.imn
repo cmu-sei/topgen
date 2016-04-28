@@ -2445,7 +2445,40 @@ node n121 {
     interface-peer {eth1 n129}
     interface-peer {eth2 n119}
     interface-peer {eth3 n410}
-    services {zebra BGP vtysh IPForward UserDefined}
+    services {zebra BGP vtysh IPForward DHCP UserDefined}
+    custom-config {
+	custom-config-id service:DHCP
+	custom-command DHCP
+	config {
+	files=('/etc/dhcp/dhcpd.conf',)
+	}
+    }
+    custom-config {
+	custom-config-id service:DHCP:/etc/dhcp/dhcpd.conf
+	custom-command /etc/dhcp/dhcpd.conf
+	config {
+	# NOTE: move these option lines into the desired pool block(s) below
+	#option domain-name "test.com";
+	#option domain-name-servers 10.0.0.1;
+	#option routers 10.0.0.1;
+
+	log-facility local6;
+
+	default-lease-time 600;
+	max-lease-time 7200;
+
+	ddns-update-style none;
+
+	subnet 12.0.0.40 netmask 255.255.255.248 {
+	  pool {
+	    range 12.0.0.42 12.0.0.45;
+	    default-lease-time 600;
+	    option routers 12.0.0.41;
+	    option domain-name-servers 8.8.8.8;
+	  }
+	}
+	}
+    }
     custom-config {
 	custom-config-id service:UserDefined
 	custom-command UserDefined

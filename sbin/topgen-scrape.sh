@@ -305,8 +305,8 @@ for VH in $TOPGEN_VHOSTS/*; do
 
   # resolve vhost DNS IP address, write to hosts.nginx
   VHIP=$(getent ahostsv4 $VB | head -1 | cut -d' ' -f1)
-  # use made-up IP '0.64.83.76' for unresolvable vhosts:
-  echo "${VHIP:-'0.64.83.76'} $VB" >> "$TOPGEN_VARETC/hosts.nginx"
+  # use made-up IP '1.1.1.1' for unresolvable vhosts:
+  echo "${VHIP:-'1.1.1.1'} $VB" >> "$TOPGEN_VARETC/hosts.nginx"
 done
 
 # done with CA directory:

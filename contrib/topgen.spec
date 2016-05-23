@@ -25,20 +25,10 @@ cybersecurity exercise environments.
 echo "nothing to build"
 
 %install
-install -d %{buildroot}/%{_unitdir}
-install -d %{buildroot}/%{_sbindir}
-install -d %{buildroot}/%{_sysconfdir}/nginx/conf.d
-install -d %{buildroot}/%{_sysconfdir}/%{name}
-install -d %{buildroot}/%{_localstatedir}/lib/%{name}/etc/postfix
-install -d %{buildroot}/%{_localstatedir}/lib/%{name}/vhosts
-install -d %{buildroot}/%{_localstatedir}/lib/%{name}/certs
-install -d %{buildroot}/%{_localstatedir}/lib/%{name}/named
-install -d %{buildroot}/%{_localstatedir}/lib/%{name}/vmail
-%{__ln_s} %{_localstatedir}/lib/%{name}/etc/nginx.conf \
-          %{buildroot}%{_sysconfdir}/nginx/conf.d/topgen.conf
-install -m 0644 -t %{buildroot}/%{_unitdir} systemd/*
-install -m 0755 -t %{buildroot}/%{_sbindir} sbin/*
-install -m 0644 -t %{buildroot}/%{_sysconfdir}/%{name} etc/*
+NAME=%{name} BUILDROOT=%{buildroot} UNITDIR=%{_unitdir} \
+             SYSCONFDIR=%{_sysconfdir} LOCALSTATEDIR=%{_localstatedir} \
+             SBINDIR=%{_sbindir} \
+  ./install.sh
 
 %post
 %systemd_post topgen-named.service topgen-nginx.service topgen-postfix.service topgen-dovecot.service

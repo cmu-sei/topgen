@@ -41,13 +41,13 @@ install -m 0755 -t %{buildroot}/%{_sbindir} sbin/*
 install -m 0644 -t %{buildroot}/%{_sysconfdir}/%{name} etc/*
 
 %post
-%systemd_post topgen-named.service topgen-nginx.service
+%systemd_post topgen-named.service topgen-nginx.service topgen-postfix.service topgen-dovecot.service
 
 %preun
-%systemd_preun topgen-named.service topgen-nginx.service
+%systemd_preun topgen-named.service topgen-nginx.service topgen-postfix.service topgen-dovecot.service
 
 %postun
-%systemd_postun_with_restart topgen-named.service topgen-nginx.service
+%systemd_postun_with_restart topgen-named.service topgen-nginx.service topgen-postfix.service topgen-dovecot.service
 
 %files
 %defattr(-,root,root,-)

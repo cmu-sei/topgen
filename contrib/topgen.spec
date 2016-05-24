@@ -42,7 +42,7 @@ NAME=%{name} BUILDROOT=%{buildroot} UNITDIR=%{_unitdir} \
 %files
 %defattr(-,root,root,-)
 # miscellaneous doc files and samples:
-%doc README LICENSE* TODO contrib
+%doc README.md LICENSE* TODO contrib
 # systemd unit files:
 %{_unitdir}/topgen*
 # nginx symlink to topgen-specific configuration:

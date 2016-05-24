@@ -1,4 +1,3 @@
-
 - add debian/ubuntu package spec
 
 - split out topgen-scrape.sh (or implement sub-commands); these are
@@ -15,7 +14,3 @@
 - SELinux policy for sbin scripts (right now calling chcon explicitly)
 
 - augment Web and DNS data with (simulated) WHOIS functionality
-
-- integrate with user simulation (GUS ?)
-
-- add simulated TOR containers (when used with core)

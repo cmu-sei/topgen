@@ -1,0 +1,54 @@
+.TH topgen-vmail.sh 8 "MAY 2016" "TopGen Simulator" "TopGen Manuals"
+.SH NAME
+topgen-vmail.sh \- configure virtual mail domains for TopGen.
+.SH SYNOPSIS
+.B topgen-vmail.sh
+[
+.B \-fvh
+] [
+.B \-c
+.I vmail-config
+] [
+.B \-t
+.I target-dir
+]
+.SH DESCRIPTION
+.B topgen-vmail.sh
+generates virtual mail server configuration for the (domain, server, users)
+sets provided in a configuration file.
+.SH OPTIONS
+Options available for the
+.B topgen-vmail.sh
+command:
+.TP
+\fB\-c\fR \fIvmail-config\fR
+Specifies an alternative virtual domain configuration file. Entries
+are provided one per line, using the following format:
+.br
+<hostname>.<domain> <ip-addr> <usr1>:<pw1> <usr2>:<pw2> ...
+.br
+This option defaults to \fB\fI/etc/topgen/vmail.cfg\fR.
+.TP
+\fB\-t\fR \fItarget-dir\fR
+Specifies an alternative directory where all results (scraped content,
+list of vhosts, certificates, config files, etc. are stored.
+.br
+This option defaults to \fB\fI/var/lib/topgen\fR.
+.TP
+\fB\-f\fR
+Force re-creation of virtual mail domain configuration.
+.br
+CAUTION: any pre-existing configuration will be lost!
+.TP
+\fB\-v\fR
+Increase verbosity level of output (may be used multiple times).
+.SH "SEE ALSO"
+.BR topgen-scrape.sh (8),
+.BR topgen-mkdns.sh (8)
+.SH BUGS
+The same certificate could be used for both IMAP and SMTP, if not for
+SELinux labeling preventing it. SELinux policy for the TopGen package
+should be sorted out, so we don't have to manually set context on the
+various bits and pieces of generated configuration.
+.SH AUTHORS
+Gabriel Somlo <glsomlo at cert.org>.

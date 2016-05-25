@@ -1,0 +1,50 @@
+.TH topgen-scrape.sh 8 "MAY 2016" "TopGen Simulator" "TopGen Manuals"
+.SH NAME
+topgen-scrape.sh \- collect and curate a corpus of web sites for TopGen.
+.SH SYNOPSIS
+.B topgen-scrape.sh
+[
+.B \-vh
+] [
+.B \-s
+.I site-list
+] [
+.B \-t
+.I target-dir
+]
+.SH DESCRIPTION
+.B topgen-scrape.sh
+will recursively scrape, clean, and curate a given list of Web sites.
+Additionally, it will issue certificates signed with a self-signed
+TopGen CA (which it will also generate, if needed). Finally, the script
+will generate a drop-in configuration file for the nginx HTTP server,
+and a hosts file containing <ip-addr fqdn> pairs for each scraped
+virtual web site (vhost).
+.SH OPTIONS
+Options available for the
+.B topgen-scrape.sh
+command:
+.TP
+\fB\-s\fR \fIsite-list\fR
+Specifies an alternative list of websites to be scraped. Sites should
+be separated by whitespace or newlines. Lines beginning with '#' are
+ignored.
+.br
+This option defaults to \fB\fI/etc/topgen/scrape_sites.txt\fR.
+.TP
+\fB\-t\fR \fItarget-dir\fR
+Specifies an alternative directory where all results (scraped content,
+list of vhosts, certificates, config files, etc. are stored.
+.br
+This option defaults to \fB\fI/var/lib/topgen\fR.
+.TP
+\fB\-v\fR
+Increase verbosity level of output (may be used multiple times).
+.SH "SEE ALSO"
+.BR topgen-vmail.sh (8),
+.BR topgen-mkdns.sh (8)
+.SH BUGS
+Content collection should probably be separated from certificate
+generation and signing.
+.SH AUTHORS
+Gabriel Somlo <glsomlo at cert.org>.

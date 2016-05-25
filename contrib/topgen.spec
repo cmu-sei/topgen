@@ -27,7 +27,7 @@ echo "nothing to build"
 %install
 NAME=%{name} BUILDROOT=%{buildroot} UNITDIR=%{_unitdir} \
              SYSCONFDIR=%{_sysconfdir} LOCALSTATEDIR=%{_localstatedir} \
-             SBINDIR=%{_sbindir} \
+             SBINDIR=%{_sbindir} MANDIR=%{_mandir} \
   ./install.sh
 
 %post
@@ -54,6 +54,8 @@ NAME=%{name} BUILDROOT=%{buildroot} UNITDIR=%{_unitdir} \
 %config(noreplace) %{_sysconfdir}/%{name}/vmail.cfg
 # topgen scripts:
 %{_sbindir}/topgen*
+# manpages:
+%{_mandir}/man*/*
 # (initially empty) directory structure for storing topgen data:
 %dir %{_localstatedir}/lib/%{name}
 %dir %{_localstatedir}/lib/%{name}/etc

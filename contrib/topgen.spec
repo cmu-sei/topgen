@@ -1,5 +1,5 @@
 Name: topgen
-Version: 0.0.2
+Version: 0.0.95
 Release: 1%{?dist}
 Summary: TopGen Exercise Internet Simulator
 License: BSD
@@ -52,7 +52,7 @@ NAME=%{name} BUILDROOT=%{buildroot} UNITDIR=%{_unitdir} \
 %config(noreplace) %{_sysconfdir}/%{name}/scrape_sites.txt
 %config(noreplace) %{_sysconfdir}/%{name}/delegations.dns
 %config(noreplace) %{_sysconfdir}/%{name}/vmail.cfg
-# topgen scripts:
+# executables:
 %{_sbindir}/topgen*
 # manpages:
 %{_mandir}/man*/*
@@ -66,6 +66,9 @@ NAME=%{name} BUILDROOT=%{buildroot} UNITDIR=%{_unitdir} \
 %dir %attr (0700, dovenull, dovenull) %{_localstatedir}/lib/%{name}/vmail
 
 %changelog
+* Thu May 26 2016 Gabriel Somlo <glsomlo at cert.org> 0.1.0-1
+- updated to 0.1.0
+
 * Thu Mar 03 2016 Gabriel Somlo <glsomlo at cert.org> 0.0.2-1
 - updated to 0.0.2 (with support for virtual email services)
 

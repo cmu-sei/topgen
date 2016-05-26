@@ -261,12 +261,6 @@ TMP_VH_CONF=$(sed -e '/req_extensions/s/^# //;
 
 # start nginx.conf here (vhost entries to be appended from loop below)
 cat > "$TOPGEN_VARETC/nginx.conf" <<- EOT
-	server {
-	  listen 80 default_server;
-	  server_name \$http_host;
-	  root $TOPGEN_VHOSTS/\$http_host;
-	}
-
 	# use a common key for all certificates:
 	ssl_certificate_key $TOPGEN_VARETC/topgen_vh.key;
 
@@ -296,6 +290,7 @@ for VH in $TOPGEN_VHOSTS/*; do
   cat >> "$TOPGEN_VARETC/nginx.conf" <<- EOT
 
 	server {
+	  listen 80;
 	  listen 443 ssl;
 	  ssl_certificate $TOPGEN_CERTS/$VB.cer;
 	  server_name $VB;

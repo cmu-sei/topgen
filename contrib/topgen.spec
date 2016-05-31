@@ -1,7 +1,7 @@
 Name: topgen
 Version: 0.0.95
 Release: 1%{?dist}
-Summary: TopGen Exercise Internet Simulator
+Summary: TopGen: Virtualized Application Service Simulator
 License: BSD
 Url: http://cert.org
 Source0: http://download.cert.org/%{name}-%{version}.tar.xz
@@ -15,8 +15,8 @@ BuildRequires: systemd-units
 BuildArch: noarch
 
 %description
-TopGen provides a simulation of the Internet (Web, DNS, etc.) for
-cybersecurity exercise environments.
+TopGen provides a simulation of various Internet application services
+(Web, DNS, etc.) for sandboxed cybersecurity exercise environments.
 
 %prep
 %setup -q

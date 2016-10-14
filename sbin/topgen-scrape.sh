@@ -112,6 +112,8 @@ $USAGE_BLURB
 WGET_OPTS='-prEHN --convert-file-only --no-check-certificate -e robots=off --random-wait -t 2'
 # make wget quiet, unless verbosity >= 2:
 ((VERBOSE>=2)) || WGET_OPTS="$WGET_OPTS -q"
+# make wget print debug output if verbosity >= 3
+((VERBOSE>=3)) && WGET_OPTS="$WGET_OPTS -d"
 
 # wget URL list:
 WGET_URLS=$(grep -v '^#' "$TOPGEN_ORIG" | \

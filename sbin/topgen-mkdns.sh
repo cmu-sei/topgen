@@ -385,6 +385,7 @@ logging {
 	channel default_debug {
 		file "data/named.run";
 		severity dynamic;
+		print-time yes;
 	};
 };
 

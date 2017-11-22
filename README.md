@@ -1,6 +1,6 @@
 # TopGen Overview #
 TopGen is a virtualized application service simulator for offline exercise
-and training networks. It allows a single host (pyhsical, VM, or container)
+and training networks. It allows a single host (physical, VM, or container)
 to serve multiple co-hosted virtual services (such as multiple HTTP vhosts,
 DNS views, and/or SMTP/IMAP virtual mail domains).
 

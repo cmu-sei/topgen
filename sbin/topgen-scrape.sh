@@ -12,8 +12,8 @@ TOPGEN_VARLIB='/var/lib/topgen'
 # if "yes", do not print out warnings:
 let VERBOSE=0
 
-# recursive scrape depth:
-let DEPTH=1
+# default recursive scrape depth:
+let DFL_DEPTH=1
 
 ###########################################################################
 ####    NO FURTHER USER-SERVICEABLE PARTS BEYOND THIS POINT !!!!!!!    ####
@@ -115,28 +115,11 @@ WGET_OPTS='-prEHN --convert-file-only --no-check-certificate -e robots=off --ran
 # make wget print debug output if verbosity >= 3
 ((VERBOSE>=3)) && WGET_OPTS="$WGET_OPTS -d"
 
-# wget URL list:
-WGET_URLS=$(grep -v '^#' "$TOPGEN_ORIG" | \
-            tr '[:space:]' ' ' | sed -e 's/[[:space:]]*$/\n/')
-[ -n "$WGET_URLS" ] || {
-  echo "
-ERROR: At least one uncommented URL must be specified
-       in \"$TOPGEN_ORIG\" !
-"
-  exit 1
-}
-
-# recursively scrape all sites listed in the $TOPGEN_ORIG file:
-wget $WGET_OPTS -U "Mozilla/5.0 (X11)" -l $DEPTH -P $TOPGEN_VHOSTS $WGET_URLS
-
-# wget will likely return some kind of error on a large recursive scrape;
-# we are only really interested if it actually segfaults:
-[ $? -eq 139 ] && {
-  echo "
-ERROR: recursive wget scrape encountered a segfault!
-"
-  exit 1
-}
+# scrape sites listed in the $TOPGEN_ORIG file:
+grep -v '^#' "$TOPGEN_ORIG" | while read URL DEPTH; do
+  wget $WGET_OPTS -U "Mozilla/5.0 (X11)" -P $TOPGEN_VHOSTS \
+       -l ${DEPTH:-$DFL_DEPTH} $URL
+done
 
 # cleanup; remove IP-only vhosts, and vhosts ending with a ":<port-number>":
 shopt -s extglob
@@ -160,9 +143,11 @@ rm -rf "$TOPGEN_SITE"
 mkdir "$TOPGEN_SITE"
 
 # intersection of scraped vhosts in $TOPGEN_VHOSTS against $TOPGEN_ORIG
+# (NOTE: sed strips " DEPTH", "http://", and "/path/..." from each line)
 comm -12 <(ls -1 $TOPGEN_VHOSTS) \
-         <(grep -v '^#' "$TOPGEN_ORIG" | tr '[:space:]' '\n' | \
-           sed -e 's|^.*//||; s|/.*$||' | sort -u) \
+         <(grep -v '^#' "$TOPGEN_ORIG" | \
+           sed -e 's|[[:space:]].*||; s|^.*//||; s|/.*$||' | \
+           sort -u) \
   > "$TOPGEN_SITE/orig_vhosts.txt"
 
 # generate topgen.info landing page (index.html):

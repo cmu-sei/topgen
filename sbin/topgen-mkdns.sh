@@ -147,7 +147,7 @@ while getopts "w:x:m:d:n:c:z:fqh?" OPT; do
     SRC_WHOSTS=$OPTARG
     ;;
   x)
-    SRC_XHOSTS=$OPTARG
+    SRC_XHOSTS="$SRC_XHOSTS $OPTARG"
     ;;
   m)
     SRC_MHOSTS=$OPTARG
@@ -274,14 +274,11 @@ WARNING: skipping host $FQDN: ip $IPADDR in delegated network $NET"
 
 
 # grab hosts in $SRC_[W|X]HOSTS, skip & warn on collision with delegations:
-#cat $SRC_WHOSTS $SRC_XHOSTS | while read IPADDR FQDN; do
-while read IPADDR FQDN; do
-  hosts_list_add $IPADDR $FQDN false
-done < $SRC_WHOSTS
-
-[ -n "$SRC_XHOSTS" -a -s "$SRC_XHOSTS" ] && while read IPADDR FQDN; do
-  hosts_list_add $IPADDR $FQDN false
-done < $SRC_XHOSTS
+for HF in $SRC_WHOSTS $SRC_XHOSTS; do
+  while read IPADDR FQDN; do
+    hosts_list_add $IPADDR $FQDN false
+  done < "$HF"
+done
 
 # grab hosts in $SRC_MHOSTS, skipping & warning on collision with delegations:
 # NOTE: also make sure these get added as MX records for their domain
@@ -593,7 +590,7 @@ SUCCESS_BLURB="
 SUCCESS: bind9 configuration generated based on the following inputs:
 
     Web hosts:   $SRC_WHOSTS
-    Xtra hosts:  $([ -n "$SRC_XHOSTS" -a -s "$SRC_XHOSTS" ] && echo $SRC_XHOSTS)
+    Xtra hosts:  $SRC_XHOSTS
     Mail srvrs:  $([ -s "$SRC_MHOSTS" ] && echo $SRC_MHOSTS)
     Delegations: $SRC_DELEG
 

@@ -1,4 +1,11 @@
+- have scraper (or curator, or whatever generates topgen.info) also generate
+  http://www.msftncsi.com/ncsi.txt containing "Microsoft NCSI".
+
 - add debian/ubuntu package spec
+	- for now, systemd units on debian/ubuntu go under /lib, which is
+	  not (yet) merged with /usr/lib; hold off on addressing this issue
+	  in our unit files, since a merge is underway (for details, see
+	  https://lwn.net/Articles/670071).
 
 - split out topgen-scrape.sh (or implement sub-commands); these are
   all potentially very long running operations (e.g., scraping may

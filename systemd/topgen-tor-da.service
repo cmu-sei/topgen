@@ -1,0 +1,22 @@
+# mostly like tor (except for a few quirks)
+.include /usr/lib/systemd/system/tor.service
+
+[Unit]
+# replace original tor service:
+Description=TopGen TOR Directory Authority
+Conflicts=tor.service
+# make sure the config file exists:
+ConditionPathExists=/var/lib/topgen/etc/tor/torrc
+# we need DNS resolution and loopbacks to be up:
+After=topgen-named.service topgen-loopback.service
+Wants=topgen-named.service
+
+[Service]
+Environment=TDA_ADDR='127.0.0.1'
+EnvironmentFile=-/var/lib/topgen/etc/tor/tda_addr
+ExecStartPre=
+ExecStartPre=/usr/bin/cp -r /var/lib/topgen/etc/tor/keys /var/lib/tor/
+ExecStartPre=/usr/bin/chown -R toranon /var/lib/tor/keys
+ExecStartPre=/usr/bin/tor --runasdaemon 0 --defaults-torrc /usr/share/tor/defaults-torrc -f /var/lib/topgen/etc/tor/torrc --verify-config
+ExecStart=
+ExecStart=/usr/bin/tor --runasdaemon 0 --defaults-torrc /usr/share/tor/defaults-torrc -f /var/lib/topgen/etc/tor/torrc --orport 5000 --dirport 7000 --nickname topgen --address ${TDA_ADDR} --outboundbindaddress ${TDA_ADDR} --authoritativedirectory 1 --v3authoritativedirectory 1 --v3authvotinginterval 10 --v3authvotedelay 2 --v3authdistdelay 2 --exitpolicy 'reject *:*'

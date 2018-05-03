@@ -11,6 +11,7 @@ Requires(postun): systemd-units
 Requires: coreutils, gawk, grep, sed, openssl, iproute
 Requires: bind, nginx, wget >= 1.17.1
 Requires: dovecot, postfix
+Requires: tor
 BuildRequires: systemd-units
 BuildArch: noarch
 

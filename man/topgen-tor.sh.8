@@ -1,0 +1,47 @@
+.TH topgen-tor.sh 8 "MAY 2018" "TopGen Simulator" "TopGen Manuals"
+.SH NAME
+topgen-tor.sh \- configure simulated TOR Directory Authority for TopGen.
+.SH SYNOPSIS
+.B topgen-tor.sh
+[
+.B \-fh
+] [
+.B \-t
+.I target-dir
+] [
+.B \-n
+.I da-hostname
+]
+.SH DESCRIPTION
+.B topgen-tor.sh
+Generates TOR Directory Authority keys and a corresponding sample config file.
+A link to the config file will also be inserted into the virual Web host
+representing the simulator's front page.
+.SH OPTIONS
+Options available for the
+.B topgen-tor.sh
+command:
+.TP
+\fB\-t\fR \fItarget-dir\fR
+Specifies an alternative base directory relative to which all other
+configuration is located.
+.br
+This option defaults to \fB\fI/var/lib/topgen\fR.
+.TP
+\fB\-n\fR \fIda-hostname\fR
+Fully qualified host name of the TOR Directory Authority, also shared
+with the virtual Web host representing the simulator's front page.
+.br
+This option defaults to \fB\fItopgen.info\fR.
+.TP
+\fB\-f\fR
+Forcibly overwrite and re-create any pre-existing configuration elements.
+.br
+CAUTION: any pre-existing configuration will be lost!
+.SH "SEE ALSO"
+.BR topgen-scrape.sh (8),
+.BR topgen-mkdns.sh (8)
+.SH BUGS
+None that we know of, probably lots we don't know about!
+.SH AUTHORS
+Gabriel Somlo <glsomlo at cert.org>.

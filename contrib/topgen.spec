@@ -1,10 +1,10 @@
 Name: topgen
-Version: 0.0.96
+Version: 0.0.97
 Release: 1%{?dist}
 Summary: TopGen: Virtualized Application Service Simulator
 License: BSD
-Url: https://github.com/cmu-sei/topgen
-Source0: http://download.cert.org/%{name}-%{version}.tar.xz
+Url: https://github.com/cmu-sei/%{name}
+Source0: http://github.com/cmu-sei/%{name}/archive/master/%{name}-master.tar.xz
 Requires(post): systemd-units
 Requires(preun): systemd-units
 Requires(postun): systemd-units
@@ -20,7 +20,7 @@ TopGen provides a simulation of various Internet application services
 (Web, DNS, etc.) for sandboxed cybersecurity exercise environments.
 
 %prep
-%setup -q
+%setup -q -n %{name}-master
 
 %build
 echo "nothing to build"
@@ -67,11 +67,5 @@ NAME=%{name} BUILDROOT=%{buildroot} UNITDIR=%{_unitdir} \
 %dir %attr (0700, dovenull, dovenull) %{_localstatedir}/lib/%{name}/vmail
 
 %changelog
-* Thu May 26 2016 Gabriel Somlo <glsomlo at cert.org> 0.1.0-1
-- updated to 0.1.0
-
-* Thu Mar 03 2016 Gabriel Somlo <glsomlo at cert.org> 0.0.2-1
-- updated to 0.0.2 (with support for virtual email services)
-
-* Tue Dec 15 2015 Gabriel Somlo <glsomlo at cert.org> 0.0.1-1
+* Fri Feb 07 2020 Gabriel Somlo <glsomlo at cert.org> 0.0.97-1
 - initial fedora package

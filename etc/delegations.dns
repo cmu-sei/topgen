@@ -18,6 +18,7 @@
 # (these will end up as NS records in the corresponding TLD forward zone)
 # NOTE: 2nd level (e.g., foo.tld) domains only!!!
 declare -A DELEGATIONS_FWD=(
+  #['evl.edu']='ns.evl.edu'
   # ['eisenhower.mil']='ns.eisenhower.mil ns.eisenhower.com'
   #['eisenhower.mil']='ns1.eisenhower.mil'
   #['mail.mil']='ns1.mail.mil'
@@ -31,6 +32,7 @@ declare -A DELEGATIONS_FWD=(
 # (these will end up as NS records in the corresponding /8 TLD reverse zone)
 # NOTE: Class-C (/24) networks only!!!
 declare -A DELEGATIONS_REV=(
+  #['81.22.162']='ns.evl.edu'
   # ['155.6.4']='ns.eisenhower.mil ns.eisenhower.com'
   #['155.6.4']='ns1.eisenhower.mil'
   #['142.59.1']='ns1.mail.mil'
@@ -40,6 +42,7 @@ declare -A DELEGATIONS_REV=(
 # Specify IP addresses for each designated name server listed above:
 # (these will end up as A (glue) records in their respective TLD zones)
 declare -A DELEGATIONS_NS=(
+  #['ns.evl.edu']='81.22.162.10'
   # ['ns.eisenhower.mil']='155.6.4.10'
   # ['ns.eisenhower.com']='155.6.4.11'
   #['ns1.eisenhower.mil']='155.6.4.10'

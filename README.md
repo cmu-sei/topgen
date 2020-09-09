@@ -155,3 +155,7 @@ To shut down all TopGen application services, run:
 This will stop all service daemons, and remove all secondary IP addresses
 from the loopback interface, returning the TopGen host to its default
 networking state.
+
+<hr>
+For ***best effort*** help, post your question in the `#greybox` (freenode)
+IRC channel.

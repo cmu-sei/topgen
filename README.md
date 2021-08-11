@@ -157,5 +157,5 @@ from the loopback interface, returning the TopGen host to its default
 networking state.
 
 <hr>
-For ***best effort*** help, post your question in the `#greybox` (freenode)
+For ***best effort*** help, post your question in the `#greybox` (libera.chat)
 IRC channel.

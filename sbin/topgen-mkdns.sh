@@ -390,6 +390,7 @@ view "caching" {
 	match-destinations { "cache_addrs"; };
 
 	recursion yes;
+	dnssec-validation no;
 
 	zone "." IN {
 		type hint;

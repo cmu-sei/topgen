@@ -167,6 +167,7 @@ cat > "$TOR_CFG/torrc" <<- EOT
 	# common settings
 	RunAsDaemon 1
 	TestingTorNetwork 1
+	AssumeReachable 1
 	TestingConsensusMaxDownloadTries 2
 	UseDefaultFallbackDirs 0
 	DataDirectory /var/lib/tor

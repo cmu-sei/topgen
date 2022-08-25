@@ -1,5 +1,5 @@
 Name: topgen
-Version: 0.0.97
+Version: 0.0.98
 Release: 1%{?dist}
 Summary: TopGen: Virtualized Application Service Simulator
 License: BSD
@@ -9,7 +9,7 @@ Requires(post): systemd-units
 Requires(preun): systemd-units
 Requires(postun): systemd-units
 Requires: coreutils, gawk, grep, sed, openssl, iproute
-Requires: bind, nginx, wget >= 1.17.1
+Requires: bind, nginx, wget
 Requires: dovecot, postfix
 Requires: tor
 BuildRequires: systemd-units
@@ -67,5 +67,5 @@ NAME=%{name} BUILDROOT=%{buildroot} UNITDIR=%{_unitdir} \
 %dir %attr (0700, dovenull, dovenull) %{_localstatedir}/lib/%{name}/vmail
 
 %changelog
-* Fri Feb 07 2020 Gabriel Somlo <glsomlo at cert.org> 0.0.97-1
+* Tue Jul 12 2022 Gabriel Somlo <glsomlo at cert.org> 0.0.98-1
 - initial fedora package

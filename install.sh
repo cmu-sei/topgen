@@ -24,7 +24,13 @@
 /usr/bin/install -d $BUILDROOT/$LOCALSTATEDIR/lib/$NAME/vmail
 /bin/ln -s $LOCALSTATEDIR/lib/$NAME/etc/nginx.conf \
            $BUILDROOT/$SYSCONFDIR/nginx/conf.d/topgen.conf
-/usr/bin/install -m 0644 -t $BUILDROOT/$UNITDIR systemd/*
+# symlink to standard services, then amend via drop-in override configurations:
+for i in systemd/topgen-*.service.d; do
+	tmp=${i##*topgen-}
+	svc=${tmp%%.d}
+	/bin/ln -s $svc $BUILDROOT/$UNITDIR/topgen-$svc
+done
+cp -r systemd/* $BUILDROOT/$UNITDIR
 /usr/bin/install -m 0755 -t $BUILDROOT/$SBINDIR sbin/*
 /usr/bin/install -m 0644 -t $BUILDROOT/$MANDIR/man8 man/*
 /usr/bin/install -m 0644 -t $BUILDROOT/$SYSCONFDIR/$NAME etc/*
